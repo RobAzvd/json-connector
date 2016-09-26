@@ -1,0 +1,5 @@
+# Dependency directories
+Examples/OAuthProxyExample/node_modules
+node_modules/
+_site/
+.idea/
