@@ -1,7 +1,5 @@
 (function () {
     var myConnector = tableau.makeConnector();
-    var dateObj = {startDate: '', endDate: ''};
-    var tagName = '';
 
     myConnector.getSchema = function (schemaCallback) {
         var value_cols = [
@@ -19,9 +17,13 @@
     };
 
     myConnector.getData = function (table, doneCallback) {
-        var dateString = "startDate=" + dateObj.startDate + "&endDate=" + dateObj.endDate;
-        var tagNameString = "&tagNames%5B%5D=" + tagName;
-        var url = "http://localhost:8000/api/chart/?" + dateString + "&interpolationTypes%5B%5D=linear&numberOfIntervals=150&shifts%5B%5D=0" + tagNameString;
+        var tableauData = JSON.parse(tableau.connectionData);
+
+        var dateString = "startDate=" + tableauData.startDate + "&endDate=" + tableauData.endDate;
+        var tagNameString = "&tagNames%5B%5D=" + tableauData.tagName;
+        var dataType = tableauData.dataType;
+
+        var url = "http://localhost:8000/api/" + dataType + "/?" + dateString + "&interpolationTypes%5B%5D=linear&numberOfIntervals=150&shifts%5B%5D=0" + tagNameString;
         $.ajax({
             url: url,
             headers: {
@@ -50,11 +52,15 @@
     tableau.registerConnector(myConnector);
 
     $(document).ready(function () {
-        dateObj.startDate = $('#start-date-one').val().trim();
-        dateObj.endDate = $('#end-date-one').val().trim();
-        tagName = $('#tag-name').val().trim();
-
         $("#submitButton").click(function () {
+            var data = {
+                startDate: $('#start-date-one').val().trim(),
+                endDate: $('#end-date-one').val().trim(),
+                tagName: $('#tag-name').val().trim(),
+                dataType: $('#data-type').val().trim()
+            };
+
+            tableau.connectionData = JSON.stringify(data);
             tableau.connectionName = "Trendminer Chart Data";
             tableau.submit();
         });
